@@ -1,12 +1,17 @@
 import pygame as pg
 import Bullets 
+from asteroid import asteroid
 
 #####################################
 # player class                      #
 # might use for enemie ships later  #
 #####################################
 class Player(pg.sprite.Sprite):
-    def __init__(self, center, win):
+    def __init__(self, center: tuple, win: pg.Surface):
+        """
+        Player ship class, creates a player in the center cordenates drawn in the win surface
+        """
+
         # Call the parent class (Sprite) constructor
         super().__init__()
 
@@ -17,7 +22,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         
         # ships center coordenates 
-        # ship cennter will be saved on a list of two floats
+        # ship center will be saved on a list of two floats
         # since rect.center holds only int
         # so movements lesser than a pixel can acummulate
         self.center = center
@@ -35,7 +40,7 @@ class Player(pg.sprite.Sprite):
         self.drag = 0.00025
 
         # max speed the ship can reach
-        self.max_speed = 0.3
+        self.max_speed = 0.2
 
         # current ship speed vector
         self.speed = pg.math.Vector2(0, 0)
@@ -50,19 +55,21 @@ class Player(pg.sprite.Sprite):
         self.ticks_last_shot = 0
 
         # time cooldown between shots
-        self.shot_cooldown = 200
+        self.shot_cooldown = 500
 
         # limits of bullets the player can have on screen
         self.bullet_limit = 3
     
-    # rotates the player by a certain angle
     def rotate(self, angle):
+        """
+        rotates the player ship by a certain angle
+        """
         # rotates director vector
         self.direction.rotate_ip(angle)
 
         # angle with the y axis
         angle = self.direction.angle_to((0,-1))
-
+        
         # rotates the original image to avoid corruption
         self.image = pg.transform.rotate(self.original_image, angle)
 
@@ -70,7 +77,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     # controls and moves the ship
-    def update(self, dt, bullets_group):
+    def update(self, dt, bullets_group, asteroid_group):
         # pressed keys
         keys = pg.key.get_pressed()
 
@@ -122,4 +129,9 @@ class Player(pg.sprite.Sprite):
         # creates new bullets
         if dt_shot >= self.shot_cooldown and keys[pg.K_SPACE] and len(bullets_group)+1 <= self.bullet_limit:
             bullets_group.add(Bullets.Bullet(self.rect.center+self.direction*10, self.direction, self.win))
-            self.ticks_last_shot = t      
+            self.ticks_last_shot = t
+        
+        # creates new bullets
+        if dt_shot >= self.shot_cooldown and keys[pg.K_m] and len(bullets_group)+1 <= self.bullet_limit:
+            asteroid_group.add(asteroid(self.rect.center+self.direction*10, 0, self.direction, self.win))
+            self.ticks_last_shot = t

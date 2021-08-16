@@ -1,13 +1,13 @@
 import pygame as pg
-import copy
+from copy import copy
 
-##########################################################
-# bullet class                                           #
-# still need some changes so that it is more generalized #
-# for diferent types of projectiles                      #
-##########################################################
+
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, position, direction, win):
+    def __init__(self, position: tuple, direction: pg.Vector2, win: pg.Surface):
+        """
+        Standard bullet class
+        """
+
         # Call the parent class (Sprite) constructor
         super().__init__()
 
@@ -21,7 +21,7 @@ class Bullet(pg.sprite.Sprite):
         self.rect.center = position
 
         # direction Vector2
-        self.direction = copy.copy(direction)
+        self.direction = copy(direction)
 
         # window and window dimensions
         self.win = win
@@ -37,7 +37,7 @@ class Bullet(pg.sprite.Sprite):
         self.ticks_created = pg.time.get_ticks()
 
         # time before the bullet disapears
-        self.duration = 1250
+        self.duration = 500
     
     def update(self, dt):
         # checks if the bullet needs to be destroyed   
@@ -58,11 +58,6 @@ class Bullet(pg.sprite.Sprite):
             self.center[1] = self.WINDOW_HEIGHT
         elif self.center[1] > self.WINDOW_HEIGHT:
             self.center[1] = 0
-
-        # checks if the bullet needs to be destroyed
-        t = pg.time.get_ticks()
-        if t - self.ticks_created > self.duration:
-            self.kill()
 
         # updates the rect center
         self.rect.center = self.center
